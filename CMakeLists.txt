@@ -3,4 +3,4 @@ project(FlowerExchange)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(FlowerExchange main.cpp)
+add_executable(FlowerExchange main.cpp Order.h)
