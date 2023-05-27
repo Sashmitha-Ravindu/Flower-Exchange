@@ -18,6 +18,9 @@ private:
     int side;
     int quantity;
     double price;
+    string status;
+
+
 public:
     Order(const string &clOrdId, const string &instrument, int side, int quantity, double price) : clOrdID(clOrdId),
                                                                                                    instrument(
@@ -66,15 +69,7 @@ public:
         Order::price = price;
     }
 
-    void print() {
-        cout << "clOrdID: " << clOrdID << '\n';
-        cout << "instrument: " << instrument << '\n';
-        cout << "side: " << side << '\n';
-        cout << "quantity: " << quantity << '\n';
-        cout << "price: " << price << '\n';
-    }
-
-    string sendPrint() {
+    string getDetails() {
         return clOrdID + "," + instrument + "," + to_string(side) + "," + to_string(quantity) + "," + to_string(price);
     }
 };
