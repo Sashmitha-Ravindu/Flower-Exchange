@@ -3,6 +3,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <algorithm>
 #include "Order.h"
 
 using namespace std;
@@ -21,6 +22,10 @@ bool isOrderValid(string clOrdId, string instrument, string side, string quantit
            stod(price) > 0.0 &&
            stoi(quantity) % 10 == 0 &&
            stoi(quantity) >= 10 && stoi(quantity) <= 1000;
+}
+
+bool compare_orders(Order ord1, Order ord2) {
+    return ord1.getPrice() < ord2.getPrice();
 }
 
 int main() {
@@ -72,20 +77,47 @@ int main() {
 //        outData << orderList[i].getDetails() << endl;
 //    }
 
-    for (int i = 0; i < orderList.size(); i++) {
-        string type = orderList[i].getInstrument();
-        if (type == "Rose") {
-            roseOrderBook[orderList[i].getSide() - 1].push_back(orderList[i]);
-        } else if (type == "Lavender") {
-            lavenderOrderBook[orderList[i].getSide() - 1].push_back(orderList[i]);
-        } else if (type == "Lotus") {
-            lotusOrderBook[orderList[i].getSide() - 1].push_back(orderList[i]);
-        } else if (type == "Tulip") {
-            tulipOrderBook[orderList[i].getSide() - 1].push_back(orderList[i]);
-        } else if (type == "Orchid") {
-            orchidOrderBook[orderList[i].getSide() - 1].push_back(orderList[i]);
-        }
+    vector<Order> roseOrders;
+
+    roseOrders.push_back(orderList[0]);
+    roseOrders.push_back(orderList[1]);
+
+    roseOrderBook.push_back(roseOrders);
+
+
+
+
+//    for (int i = 0; i < orderList.size(); i++) {
+//        string type = orderList[i].getInstrument();
+//        if (type == "Rose") {
+//            roseOrderBook[orderList[i].getSide() - 1].push_back(orderList[i]);
+//            sort(roseOrderBook[orderList[i].getSide() - 1].begin(), roseOrderBook[orderList[i].getSide() - 1].end(),
+//                 compare_orders);
+//        } else if (type == "Lavender") {
+//            lavenderOrderBook[orderList[i].getSide() - 1].push_back(orderList[i]);
+//            sort(roseOrderBook[orderList[i].getSide() - 1].begin(), roseOrderBook[orderList[i].getSide() - 1].end(),
+//                 compare_orders);
+//        } else if (type == "Lotus") {
+//            lotusOrderBook[orderList[i].getSide() - 1].push_back(orderList[i]);
+//            sort(roseOrderBook[orderList[i].getSide() - 1].begin(), roseOrderBook[orderList[i].getSide() - 1].end(),
+//                 compare_orders);
+//        } else if (type == "Tulip") {
+//            tulipOrderBook[orderList[i].getSide() - 1].push_back(orderList[i]);
+//            sort(roseOrderBook[orderList[i].getSide() - 1].begin(), roseOrderBook[orderList[i].getSide() - 1].end(),
+//                 compare_orders);
+//        } else if (type == "Orchid") {
+//            orchidOrderBook[orderList[i].getSide() - 1].push_back(orderList[i]);
+//            sort(roseOrderBook[orderList[i].getSide() - 1].begin(), roseOrderBook[orderList[i].getSide() - 1].end(),
+//                 compare_orders);
+//        }
+//    }
+
+    for (int i = 0; i < roseOrderBook[0].size(); ++i) {
+        cout << roseOrderBook[0][i].getDetails() << endl;
     }
+//    for (int i = 0; i < roseOrderBook[1].size(); ++i) {
+//        cout << roseOrderBook[1][i].getDetails() << endl;
+//    }
 
     outData.close();
     return 0;
