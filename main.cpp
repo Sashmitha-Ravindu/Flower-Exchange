@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <queue>
 
 using namespace std;
 
@@ -57,9 +58,13 @@ void validateOrder(Order &ord) {
     }
 }
 
-/*bool compare_orders(Order ord1, Order ord2) {
-    return ord1.getPrice() < ord2.getPrice();
-}*/
+bool compare_orders_asc(Order ord1, Order ord2) {
+    return ord1.price < ord2.price;
+}
+
+bool compare_orders_desc(Order ord1, Order ord2) {
+    return ord1.price > ord2.price;
+}
 
 int main() {
     vector<Order> orderList;
@@ -94,16 +99,22 @@ int main() {
         orderList.push_back(order1);
     }
 
-    vector<vector<Order>> roseOrderBook;
-    vector<vector<Order>> lavenderOrderBook;
-    vector<vector<Order>> lotusOrderBook;
-    vector<vector<Order>> tulipOrderBook;
-    vector<vector<Order>> orchidOrderBook;
+    vector<Order> roseBuyOrderBook;
+    vector<Order> roseSellOrderBook;
+    vector<Order> lavenderBuyOrderBook;
+    vector<Order> lavenderSellOrderBook;
+    vector<Order> lotusBuyOrderBook;
+    vector<Order> lotusSellOrderBook;
+    vector<Order> tulipBuyOrderBook;
+    vector<Order> tulipSellOrderBook;
+    vector<Order> orchidBuyOrderBook;
+    vector<Order> orchidSellOrderBook;
 
 
     ofstream outData;
     outData.open("../execution_rep.csv", ofstream::out | ofstream::trunc);
-    outData << "Order ID,Client Order,Instrument,Side,Exec Status,Quantity,Price,Reason" << endl;
+    outData << "Order ID,Client Order,Instrument,Side,Exec Status,Quantity,Price,Transaction time,Reason" << endl;
+
 //    for (int i = 0; i < orderList.size(); ++i) {
 //        outData << orderList[i].getDetails() << endl;
 //    }
@@ -114,8 +125,7 @@ int main() {
 //    roseOrders.push_back(orderList[1]);
 //
 //    roseOrderBook.push_back(roseOrders);
-
-    struct minComparator {
+    /*struct minComparator {
         bool compare(Order &or1, Order &or2) {
             if (or1.price != or2.price) {
                 return or1.price > or2.price;
@@ -131,8 +141,57 @@ int main() {
             }
             return or1.orderId > or2.orderId;
         }
-    };
+    };*/
 
+    /*priority_queue<Order, vector<Order>, maxComparator> buyOrders;
+    priority_queue<Order, vector<Order>, minComparator> sellOrders;
+*/
+
+    for (int i = 0; i < orderList.size(); ++i) {
+        Order currOrder = orderList[i];
+        if (currOrder.instrument == "Rose") {
+            if (currOrder.side == 1) {
+                roseBuyOrderBook.push_back(currOrder);
+            } else if (currOrder.side == 2) {
+                roseSellOrderBook.push_back(currOrder);
+            }
+        } else if (currOrder.instrument == "Lavender") {
+            if (currOrder.side == 1) {
+                lavenderBuyOrderBook.push_back(currOrder);
+            } else if (currOrder.side == 2) {
+                lavenderSellOrderBook.push_back(currOrder);
+            }
+        } else if (currOrder.instrument == "Lotus") {
+            if (currOrder.side == 1) {
+                lotusBuyOrderBook.push_back(currOrder);
+            } else if (currOrder.side == 2) {
+                lotusSellOrderBook.push_back(currOrder);
+            }
+        } else if (currOrder.instrument == "Tulip") {
+            if (currOrder.side == 1) {
+                tulipBuyOrderBook.push_back(currOrder);
+            } else if (currOrder.side == 2) {
+                tulipSellOrderBook.push_back(currOrder);
+            }
+        } else if (currOrder.instrument == "Orchid") {
+            if (currOrder.side == 1) {
+                orchidBuyOrderBook.push_back(currOrder);
+            } else if (currOrder.side == 2) {
+                orchidSellOrderBook.push_back(currOrder);
+            }
+        }
+    }
+
+    sort(roseBuyOrderBook.begin(), roseBuyOrderBook.end(), compare_orders_desc);
+    sort(roseSellOrderBook.begin(), roseSellOrderBook.end(), compare_orders_asc);
+    sort(lavenderBuyOrderBook.begin(), lavenderBuyOrderBook.end(), compare_orders_desc);
+    sort(lavenderSellOrderBook.begin(), lavenderSellOrderBook.end(), compare_orders_asc);
+    sort(tulipBuyOrderBook.begin(), tulipBuyOrderBook.end(), compare_orders_desc);
+    sort(tulipSellOrderBook.begin(), tulipSellOrderBook.end(), compare_orders_asc);
+    sort(lotusBuyOrderBook.begin(), lotusBuyOrderBook.end(), compare_orders_desc);
+    sort(lotusSellOrderBook.begin(), lotusSellOrderBook.end(), compare_orders_asc);
+    sort(orchidBuyOrderBook.begin(), orchidBuyOrderBook.end(), compare_orders_desc);
+    sort(orchidSellOrderBook.begin(), orchidSellOrderBook.end(), compare_orders_asc);
 
 
 //    for (int i = 0; i < orderList.size(); i++) {
@@ -160,9 +219,9 @@ int main() {
 //        }
 //    }
 
-    for (int i = 0; i < roseOrderBook[0].size(); ++i) {
-        cout << roseOrderBook[0][i].getDetails() << endl;
-    }
+    /* for (int i = 0; i < roseBuyOrderBook.size(); ++i) {
+         cout << roseOrderBook[0][i].getDetails() << endl;
+     }*/
 //    for (int i = 0; i < roseOrderBook[1].size(); ++i) {
 //        cout << roseOrderBook[1][i].getDetails() << endl;
 //    }
