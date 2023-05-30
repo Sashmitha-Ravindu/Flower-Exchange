@@ -120,7 +120,16 @@ int main() {
             if (or1.price != or2.price) {
                 return or1.price > or2.price;
             }
+            return or1.orderId > or2.orderId;
+        }
+    };
 
+    struct maxComparator {
+        bool compare(Order &or1, Order &or2) {
+            if (or1.price != or2.price) {
+                return or1.price < or2.price;
+            }
+            return or1.orderId > or2.orderId;
         }
     };
 
