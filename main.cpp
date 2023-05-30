@@ -7,17 +7,20 @@
 
 using namespace std;
 
-int order_receiveId=0;
+int order_receiveId = 0;
 
 class Order {
 public:
     string clOrdID;
+    string orderId = "ord" + to_string(++order_receiveId);
     string instrument;
     int side;
-    int quantity;
     double price;
-    string status;
-    int ord
+    int quantity;
+    int status = 0;
+    string reason;
+    string transactionTime;
+
 
     Order(const string &clOrdId, const string &instrument, int side, int quantity, double price) : clOrdID(clOrdId),
                                                                                                    instrument(
@@ -33,19 +36,25 @@ public:
 };
 
 
-bool isOrderValid(string clOrdId, string instrument, string side, string quantity, string price) {
-    string instrumentList[] = {"Rose", "Lavender", "Lotus", "Tulip", "Orchid"};
-    return !clOrdId.empty() &&
-           !instrument.empty() &&
-           !side.empty() &&
-           !quantity.empty() &&
-           !price.empty() &&
-           (instrument == "Rose" || instrument == "Lavender" || instrument == "Lotus" || instrument == "Tulip" ||
-            instrument == "Orchid") &&
-           (stoi(side) == 1 || stoi(side) == 2) &&
-           stod(price) > 0.0 &&
-           stoi(quantity) % 10 == 0 &&
-           stoi(quantity) >= 10 && stoi(quantity) <= 1000;
+void validateOrder(Order &ord) {
+    if (ord.clOrdID.empty()) {
+        ord.status = 1;
+        ord.reason = "Invalid Client Order ID";
+    } else if (ord.instrument.empty() ||
+               !(ord.instrument == "Rose" || ord.instrument == "Lavender" || ord.instrument == "Lotus" ||
+                 ord.instrument == "Tulip" || ord.instrument == "Orchid")) {
+        ord.status = 1;
+        ord.reason = "Invalid instrument";
+    } else if (ord.side != 1 && ord.side != 2) {
+        ord.status = 1;
+        ord.reason = "Invalid side";
+    } else if (ord.price <= 0) {
+        ord.status = 1;
+        ord.reason = "Invalid price";
+    } else if (ord.quantity < 10 || ord.quantity >= 1000 || ord.quantity % 10 != 0) {
+        ord.status = 1;
+        ord.reason = "Invalid quantity";
+    }
 }
 
 /*bool compare_orders(Order ord1, Order ord2) {
@@ -78,12 +87,10 @@ int main() {
         getline(ip, quantity, ',');
         getline(ip, price, '\n');
 
-        if (!isOrderValid(clOrdID, instrument, side, quantity, price)) {
-            cout << "Invalid Input" << endl;
-            return 1;
-        }
-
         Order order1(clOrdID, instrument, stoi(side), stoi(quantity), stod(price));
+
+        validateOrder(order1);
+
         orderList.push_back(order1);
     }
 
@@ -108,14 +115,14 @@ int main() {
 //
 //    roseOrderBook.push_back(roseOrders);
 
-struct minComparator{
-    bool compare(Order& or1,Order& or2){
-        if(or1.price!=or2.price){
-            return or1.price>or2.price;
-        }
+    struct minComparator {
+        bool compare(Order &or1, Order &or2) {
+            if (or1.price != or2.price) {
+                return or1.price > or2.price;
+            }
 
-    }
-};
+        }
+    };
 
 
 
