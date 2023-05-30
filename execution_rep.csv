@@ -1,1 +1,1 @@
-Order ID,Client Order,Instrument,Side,Exec Status,Quantity,Price,Reason
+Order ID,Client Order,Instrument,Side,Exec Status,Quantity,Price,Transaction time,Reason

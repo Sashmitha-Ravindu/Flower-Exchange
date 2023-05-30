@@ -5,6 +5,7 @@
 #include <vector>
 #include <algorithm>
 #include <queue>
+#include <chrono>
 
 using namespace std;
 
@@ -19,8 +20,9 @@ public:
     double price;
     int quantity;
     int status = 0;
-    string reason;
-    string transactionTime;
+    string reason=" - ";
+    string transactionTime="";
+
 
 
     Order(const string &clOrdId, const string &instrument, int side, int quantity, double price) : clOrdID(clOrdId),
@@ -65,6 +67,95 @@ bool compare_orders_asc(Order ord1, Order ord2) {
 bool compare_orders_desc(Order ord1, Order ord2) {
     return ord1.price > ord2.price;
 }
+
+void processBuyOrder(Order ord,vector<Order>& orders,ofstream& outFile,vector<Order>& relavantOrderList){
+//    if (ord.instrument == "Rose") {
+//
+//    } else if (ord.instrument == "Lavender") {
+//
+//    } else if (ord.instrument == "Lotus") {
+//
+//    } else if (ord.instrument == "Tulip") {
+//
+//    } else if (ord.instrument == "Orchid") {
+//
+//    }
+
+    auto startTime=std::chrono::system_clock::now();
+
+    for (int i = 0; i < orders.size(); ++i) {
+        Order currOrder= orders[i];
+        if(currOrder.status==1){
+            outFile << ord.orderId<<","<<ord.clOrdID<<","<<ord.instrument<<","<<ord.side<<","<<ord.status<<","<<ord.quantity<<","<<ord.price<<","<<ord.transactionTime<<","<<ord.reason<<endl;
+        }
+        else if (currOrder.price<=ord.price && currOrder.status!=2 && currOrder.status!=1){
+            if (ord.quantity==currOrder.quantity){
+                ord.status=2;
+                currOrder.status=2;
+                auto endTime=std::chrono::system_clock::now();
+                auto elapsed_seconds=endTime-startTime;
+                ord.transactionTime=to_string(elapsed_seconds.count());
+                outFile << ord.orderId<<","<<ord.clOrdID<<","<<ord.instrument<<","<<ord.side<<","<<ord.status<<","<<ord.quantity<<","<<ord.price<<","<<ord.transactionTime<<","<<ord.reason<<endl;
+                outFile << currOrder.orderId<<","<<currOrder.clOrdID<<","<<currOrder.instrument<<","<<currOrder.side<<","<<currOrder.status<<","<<currOrder.quantity<<","<<currOrder.price<<","<<currOrder.transactionTime<<","<<currOrder.reason<<endl;
+            }else if (ord.quantity<currOrder.quantity){
+                ord.status=2;
+                currOrder.status=3;
+                outFile << ord.orderId<<","<<ord.clOrdID<<","<<ord.instrument<<","<<ord.side<<","<<ord.status<<","<<ord.quantity<<","<<ord.price<<","<<ord.transactionTime<<","<<ord.reason<<endl;
+                outFile << currOrder.orderId<<","<<currOrder.clOrdID<<","<<currOrder.instrument<<","<<currOrder.side<<","<<currOrder.status<<","<<currOrder.quantity<<","<<currOrder.price<<","<<currOrder.transactionTime<<","<<currOrder.reason<<endl;
+            }else if (ord.quantity>currOrder.quantity){
+                ord.status=3;
+                currOrder.status=2;
+                relavantOrderList.push_back(ord);
+                sort(relavantOrderList.begin(),relavantOrderList.end(), compare_orders_desc);
+                outFile << ord.orderId<<","<<ord.clOrdID<<","<<ord.instrument<<","<<ord.side<<","<<ord.status<<","<<ord.quantity<<","<<ord.price<<","<<ord.transactionTime<<","<<ord.reason<<endl;
+                outFile << currOrder.orderId<<","<<currOrder.clOrdID<<","<<currOrder.instrument<<","<<currOrder.side<<","<<currOrder.status<<","<<currOrder.quantity<<","<<currOrder.price<<","<<currOrder.transactionTime<<","<<currOrder.reason<<endl;
+            }
+        }else if(ord.status==0){
+            outFile << ord.orderId<<","<<ord.clOrdID<<","<<ord.instrument<<","<<ord.side<<","<<ord.status<<","<<ord.quantity<<","<<ord.price<<","<<ord.transactionTime<<","<<ord.reason<<endl;
+            relavantOrderList.push_back(ord);
+            sort(relavantOrderList.begin(),relavantOrderList.end(), compare_orders_desc);
+        }
+    }
+}
+
+void processSellOrder(Order ord,vector<Order>& orders,ofstream& outFile,vector<Order>& relavantOrderList){
+    auto startTime=std::chrono::system_clock::now();
+
+    for (int i = 0; i < orders.size(); ++i) {
+        Order currOrder= orders[i];
+        if(currOrder.status==1){
+            outFile << ord.orderId<<","<<ord.clOrdID<<","<<ord.instrument<<","<<ord.side<<","<<ord.status<<","<<ord.quantity<<","<<ord.price<<","<<ord.transactionTime<<","<<ord.reason<<endl;
+        }
+        else if (currOrder.price>=ord.price && currOrder.status!=2 && currOrder.status!=1){
+            if (ord.quantity==currOrder.quantity){
+                ord.status=2;
+                currOrder.status=2;
+                auto endTime=std::chrono::system_clock::now();
+                auto elapsed_seconds=endTime-startTime;
+                ord.transactionTime=to_string(elapsed_seconds.count());
+                outFile << ord.orderId<<","<<ord.clOrdID<<","<<ord.instrument<<","<<ord.side<<","<<ord.status<<","<<ord.quantity<<","<<ord.price<<","<<ord.transactionTime<<","<<ord.reason<<endl;
+                outFile << currOrder.orderId<<","<<currOrder.clOrdID<<","<<currOrder.instrument<<","<<currOrder.side<<","<<currOrder.status<<","<<currOrder.quantity<<","<<currOrder.price<<","<<currOrder.transactionTime<<","<<currOrder.reason<<endl;
+            }else if (ord.quantity<currOrder.quantity){
+                ord.status=2;
+                currOrder.status=3;
+                outFile << ord.orderId<<","<<ord.clOrdID<<","<<ord.instrument<<","<<ord.side<<","<<ord.status<<","<<ord.quantity<<","<<ord.price<<","<<ord.transactionTime<<","<<ord.reason<<endl;
+                outFile << currOrder.orderId<<","<<currOrder.clOrdID<<","<<currOrder.instrument<<","<<currOrder.side<<","<<currOrder.status<<","<<currOrder.quantity<<","<<currOrder.price<<","<<currOrder.transactionTime<<","<<currOrder.reason<<endl;
+            }else if (ord.quantity>currOrder.quantity){
+                ord.status=3;
+                currOrder.status=2;
+                relavantOrderList.push_back(ord);
+                sort(relavantOrderList.begin(),relavantOrderList.end(), compare_orders_asc);
+                outFile << ord.orderId<<","<<ord.clOrdID<<","<<ord.instrument<<","<<ord.side<<","<<ord.status<<","<<ord.quantity<<","<<ord.price<<","<<ord.transactionTime<<","<<ord.reason<<endl;
+                outFile << currOrder.orderId<<","<<currOrder.clOrdID<<","<<currOrder.instrument<<","<<currOrder.side<<","<<currOrder.status<<","<<currOrder.quantity<<","<<currOrder.price<<","<<currOrder.transactionTime<<","<<currOrder.reason<<endl;
+            }
+        }else if(ord.status==0){
+            outFile << ord.orderId<<","<<ord.clOrdID<<","<<ord.instrument<<","<<ord.side<<","<<ord.status<<","<<ord.quantity<<","<<ord.price<<","<<ord.transactionTime<<","<<ord.reason<<endl;
+            relavantOrderList.push_back(ord);
+            sort(relavantOrderList.begin(),relavantOrderList.end(), compare_orders_asc);
+        }
+    }
+}
+
 
 int main() {
     vector<Order> orderList;
@@ -192,6 +283,44 @@ int main() {
     sort(lotusSellOrderBook.begin(), lotusSellOrderBook.end(), compare_orders_asc);
     sort(orchidBuyOrderBook.begin(), orchidBuyOrderBook.end(), compare_orders_desc);
     sort(orchidSellOrderBook.begin(), orchidSellOrderBook.end(), compare_orders_asc);
+
+    //process orders
+
+    for (int i = 0; i < orderList.size(); ++i) {
+        Order currOrder = orderList[i];
+        if (currOrder.instrument == "Rose") {
+            if (currOrder.side == 1) {
+                processBuyOrder(currOrder,roseSellOrderBook,outData,roseBuyOrderBook);
+            } else if (currOrder.side == 2) {
+                processBuyOrder(currOrder,roseBuyOrderBook,outData,roseSellOrderBook);
+            }
+        } else if (currOrder.instrument == "Lavender") {
+            if (currOrder.side == 1) {
+                processBuyOrder(currOrder,lavenderSellOrderBook,outData,lavenderBuyOrderBook);
+            } else if (currOrder.side == 2) {
+                processBuyOrder(currOrder,lavenderBuyOrderBook,outData,lavenderSellOrderBook);
+            }
+        } else if (currOrder.instrument == "Lotus") {
+            if (currOrder.side == 1) {
+                processBuyOrder(currOrder,lotusSellOrderBook,outData,lotusBuyOrderBook);
+            } else if (currOrder.side == 2) {
+                processBuyOrder(currOrder,lotusBuyOrderBook,outData,lotusSellOrderBook);
+            }
+        } else if (currOrder.instrument == "Tulip") {
+            if (currOrder.side == 1) {
+                processBuyOrder(currOrder,tulipSellOrderBook,outData,tulipBuyOrderBook);
+            } else if (currOrder.side == 2) {
+                processBuyOrder(currOrder,tulipBuyOrderBook,outData,tulipSellOrderBook);
+            }
+        } else if (currOrder.instrument == "Orchid") {
+            if (currOrder.side == 1) {
+                processBuyOrder(currOrder,orchidSellOrderBook,outData,orchidBuyOrderBook);
+            } else if (currOrder.side == 2) {
+                processBuyOrder(currOrder,orchidBuyOrderBook,outData,orchidSellOrderBook);
+            }
+        }
+    }
+
 
 
 //    for (int i = 0; i < orderList.size(); i++) {
