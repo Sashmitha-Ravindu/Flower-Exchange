@@ -4,9 +4,33 @@
 #include <string>
 #include <vector>
 #include <algorithm>
-#include "Order.h"
 
 using namespace std;
+
+int order_receiveId=0;
+
+class Order {
+public:
+    string clOrdID;
+    string instrument;
+    int side;
+    int quantity;
+    double price;
+    string status;
+    int ord
+
+    Order(const string &clOrdId, const string &instrument, int side, int quantity, double price) : clOrdID(clOrdId),
+                                                                                                   instrument(
+                                                                                                           instrument),
+                                                                                                   side(side),
+                                                                                                   quantity(quantity),
+                                                                                                   price(price) {}
+
+
+    string getDetails() {
+        return clOrdID + "," + instrument + "," + to_string(side) + "," + to_string(quantity) + "," + to_string(price);
+    }
+};
 
 
 bool isOrderValid(string clOrdId, string instrument, string side, string quantity, string price) {
@@ -24,9 +48,9 @@ bool isOrderValid(string clOrdId, string instrument, string side, string quantit
            stoi(quantity) >= 10 && stoi(quantity) <= 1000;
 }
 
-bool compare_orders(Order ord1, Order ord2) {
+/*bool compare_orders(Order ord1, Order ord2) {
     return ord1.getPrice() < ord2.getPrice();
-}
+}*/
 
 int main() {
     vector<Order> orderList;
@@ -77,13 +101,21 @@ int main() {
 //        outData << orderList[i].getDetails() << endl;
 //    }
 
-    vector<Order> roseOrders;
+//    vector<Order> roseOrders;
+//
+//    roseOrders.push_back(orderList[0]);
+//    roseOrders.push_back(orderList[1]);
+//
+//    roseOrderBook.push_back(roseOrders);
 
-    roseOrders.push_back(orderList[0]);
-    roseOrders.push_back(orderList[1]);
+struct minComparator{
+    bool compare(Order& or1,Order& or2){
+        if(or1.price!=or2.price){
+            return or1.price>or2.price;
+        }
 
-    roseOrderBook.push_back(roseOrders);
-
+    }
+};
 
 
 
