@@ -22,7 +22,7 @@ public:
     int quantity;
     int status = 0;
     string reason = " - ";
-    string transactionTime = "";
+    string transactionTime = " ";
 
 
     Order(const string &clOrdId, const string &instrument, int side, int quantity, double price) : clOrdID(clOrdId),
@@ -75,27 +75,31 @@ void processBuyOrder(Order ord, vector<Order> &orders, vector<Order> &relavantOr
     for (int i = 0; i < orders.size(); ++i) {
         Order currOrder = orders[i];
         if (currOrder.status == 1) {
+            auto endTime = std::chrono::system_clock::now();
+            auto elapsed_seconds = endTime - startTime;
+            currOrder.transactionTime = to_string(elapsed_seconds.count());
             outData << ord.orderId << "," << ord.clOrdID << "," << ord.instrument << "," << ord.side << ","
                     << ord.status << "," << ord.quantity << "," << ord.price << "," << ord.transactionTime << ","
                     << ord.reason << endl;
-        } else if (currOrder.price <= ord.price && currOrder.status != 2 && currOrder.status != 1 &&
-                   currOrder.quantity > 0) {
+        } else if (currOrder.price <= ord.price && currOrder.status != 2 && currOrder.quantity > 0) {
             if (ord.quantity == currOrder.quantity) {
 
                 ord.status = 2;
                 currOrder.status = 2;
                 auto endTime = std::chrono::system_clock::now();
                 auto elapsed_seconds = endTime - startTime;
+                cout << to_string(elapsed_seconds.count()) << endl;
+                cout << to_string(elapsed_seconds.count()) << endl;
                 ord.transactionTime = to_string(elapsed_seconds.count());
                 outData << ord.orderId << "," << ord.clOrdID << "," << ord.instrument << "," << ord.side << ","
                         << ord.status << "," << ord.quantity << "," << currOrder.price << "," << ord.transactionTime
-                        << ","
-                        << ord.reason << endl;
+                        << "," << ord.reason << endl;
                 outData << currOrder.orderId << "," << currOrder.clOrdID << "," << currOrder.instrument << ","
                         << currOrder.side << "," << currOrder.status << "," << currOrder.quantity << ","
                         << currOrder.price << "," << currOrder.transactionTime << "," << currOrder.reason << endl;
                 currOrder.quantity = 0;
                 ord.quantity = 0;
+                outData.flush();
             } else if (ord.quantity < currOrder.quantity) {
 
                 ord.status = 2;
@@ -116,9 +120,9 @@ void processBuyOrder(Order ord, vector<Order> &orders, vector<Order> &relavantOr
                 relavantOrderList.push_back(ord);
                 sort(relavantOrderList.begin(), relavantOrderList.end(), compare_orders_desc);
                 outData << ord.orderId << "," << ord.clOrdID << "," << ord.instrument << "," << ord.side << ","
-                        << ord.status << "," << currOrder.quantity << "," << currOrder.price << "," << ord.transactionTime
-                        << ","
-                        << ord.reason << endl;
+                        << ord.status << "," << currOrder.quantity << "," << currOrder.price << ","
+                        << ord.transactionTime
+                        << "," << ord.reason << endl;
                 outData << currOrder.orderId << "," << currOrder.clOrdID << "," << currOrder.instrument << ","
                         << currOrder.side << "," << currOrder.status << "," << currOrder.quantity << ","
                         << currOrder.price << "," << currOrder.transactionTime << "," << currOrder.reason << endl;
@@ -143,10 +147,13 @@ void processSellOrder(Order ord, vector<Order> &orders, vector<Order> &relavantO
     for (int i = 0; i < orders.size(); ++i) {
         Order currOrder = orders[i];
         if (currOrder.status == 1) {
+            auto endTime = std::chrono::system_clock::now();
+            auto elapsed_seconds = endTime - startTime;
+            currOrder.transactionTime = to_string(elapsed_seconds.count());
             outData << ord.orderId << "," << ord.clOrdID << "," << ord.instrument << "," << ord.side << ","
                     << ord.status << "," << ord.quantity << "," << ord.price << "," << ord.transactionTime << ","
                     << ord.reason << endl;
-        } else if (currOrder.price >= ord.price && currOrder.status != 2 && currOrder.status != 1 &&
+        } else if (currOrder.price >= ord.price && currOrder.status != 2 &&
                    currOrder.quantity > 0) {
             if (ord.quantity == currOrder.quantity) {
 
@@ -184,7 +191,8 @@ void processSellOrder(Order ord, vector<Order> &orders, vector<Order> &relavantO
                 relavantOrderList.push_back(ord);
                 sort(relavantOrderList.begin(), relavantOrderList.end(), compare_orders_asc);
                 outData << ord.orderId << "," << ord.clOrdID << "," << ord.instrument << "," << ord.side << ","
-                        << ord.status << "," << currOrder.quantity << "," << currOrder.price << "," << ord.transactionTime
+                        << ord.status << "," << currOrder.quantity << "," << currOrder.price << ","
+                        << ord.transactionTime
                         << ","
                         << ord.reason << endl;
                 outData << currOrder.orderId << "," << currOrder.clOrdID << "," << currOrder.instrument << ","
@@ -224,7 +232,7 @@ int main() {
     getline(ip, side, ',');
     getline(ip, quantity, ',');
     getline(ip, price, '\n');
-
+    int m=0;
     while (ip.good()) {
         getline(ip, clOrdID, ',');
         getline(ip, instrument, ',');
@@ -237,6 +245,8 @@ int main() {
         validateOrder(order1);
 
         orderList.push_back(order1);
+//        cout << ++m << endl;
+//        cout <<order1.getDetails() << endl;
     }
 
     vector<Order> roseBuyOrderBook;
@@ -258,7 +268,15 @@ int main() {
 
     for (int i = 0; i < orderList.size(); ++i) {
         Order currOrder = orderList[i];
-        if (currOrder.instrument == "Rose") {
+        if (currOrder.status == 1) {
+            outData << currOrder.orderId << "," << currOrder.clOrdID << "," << currOrder.instrument << ","
+                    << currOrder.side << ","
+                    << currOrder.status << "," << currOrder.quantity << "," << currOrder.price << ","
+                    << currOrder.transactionTime << ","
+                    << currOrder.reason << endl;
+            continue;
+        }
+        else if (currOrder.instrument == "Rose") {
             if (currOrder.side == 1) {
                 processBuyOrder(currOrder, roseSellOrderBook, roseBuyOrderBook);
             } else if (currOrder.side == 2) {
@@ -290,6 +308,9 @@ int main() {
             }
         }
     }
+
+
+
     outData.flush();
     outData.close();
     return 0;
